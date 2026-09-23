@@ -450,6 +450,21 @@ footer { text-align: center; color: #8aa3c9; font-size: 12px; margin-top: 26px; 
 .prize-valid { font-size: 13px; font-weight: 700; color: #b45309; margin-top: 6px; }
 .prize-valid.expired { color: #b91c1c; }
 .prize-valid.used { color: #64748b; }
+.redeem-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+.redeem-btn:hover { filter: brightness(1.05); }
 .empty-prizes { padding: 18px; text-align: center; color: #667085; border: 1px dashed #cfd5df; border-radius: 14px; }
 
 /* ---------- Responsivo ---------- */

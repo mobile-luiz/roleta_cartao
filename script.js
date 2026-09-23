@@ -4,7 +4,7 @@
 
 // ⚠️ CONFIGURE AQUI o WhatsApp da CLÍNICA (só números, com 55 + DDD).
 // Ex.: "5581999999999". Se ficar vazio, o WhatsApp abre para a pessoa escolher o contato.
-const CLINIC_WHATSAPP = "";
+const CLINIC_WHATSAPP = "5581982714884";
 
 const MAX_ROUNDS = 10;
 const COUPON_VALID_DAYS = 7;       // validade do cupom de desconto
@@ -646,7 +646,8 @@ async function searchMyPrizes() {
       return;
     }
     prizesStatus.textContent = `${prizes.length} ${prizes.length === 1 ? "prêmio encontrado" : "prêmios encontrados"}`;
-    prizesList.innerHTML = prizes.map(item => {
+    lastPrizesPhone = phone;
+    prizesList.innerHTML = prizes.map((item, index) => {
       const isDiscount = item.type === "discount";
       const isAdesao = item.type === "adesao";
       const title = isDiscount ? `${Number(item.value || 0)}% OFF` : isAdesao ? "Adesão grátis" : "Brinde especial";
@@ -666,8 +667,12 @@ async function searchMyPrizes() {
         <div class="prize-meta">Rodada ${escapeHtml(item.roundNumber || "-")} · ${escapeHtml(item.date || "")} ${escapeHtml(item.time || "")}</div>
         ${validText ? `<div class="prize-valid ${statusClass}">⏳ ${escapeHtml(validText)}</div>` : ""}
         <span class="prize-status ${statusClass}">${statusText}</span>
+        ${!used && !expired
+          ? `<button class="redeem-btn" type="button" data-index="${index}">📲 Resgatar prêmio pelo WhatsApp</button>`
+          : ""}
       </div>`;
     }).join("");
+    lastPrizes = prizes;
     trackEvent("my_prizes_consulted", { result_count: prizes.length });
   } catch (error) {
     console.error(error);
@@ -676,6 +681,30 @@ async function searchMyPrizes() {
     searchPrizesBtn.disabled = false;
   }
 }
+
+// ---------- Resgatar prêmio (WhatsApp da clínica) ----------
+let lastPrizes = [];
+let lastPrizesPhone = "";
+prizesList.addEventListener("click", (event) => {
+  const btn = event.target.closest(".redeem-btn");
+  if (!btn) return;
+  const item = lastPrizes[Number(btn.dataset.index)];
+  if (!item) return;
+  const prizeName = item.type === "discount" ? `${Number(item.value || 0)}% OFF em consulta`
+    : item.type === "adesao" ? "Adesão grátis do Cartão PAD Saúde+"
+    : "Brinde especial";
+  const lines = [
+    "Olá! Quero resgatar meu prêmio da Roleta do Cartão PAD Saúde+ 🎉",
+    "",
+    `🏆 Prêmio: ${prizeName}`,
+    item.coupon ? `🎟️ Cupom: ${item.coupon}` : null,
+    participant?.name ? `👤 Nome: ${participant.name}` : null,
+    `📱 WhatsApp da participação: ${maskPhone(lastPrizesPhone)}`,
+    `📅 Ganho em: ${[item.date, item.time].filter(Boolean).join(" ")}${item.roundNumber ? ` (rodada ${item.roundNumber})` : ""}`
+  ].filter((l) => l !== null);
+  trackEvent("prize_redeem_click", { prize_type: String(item.type || "") });
+  openWhatsApp(lines.join("\n"));
+});
 
 myPrizesBtn.addEventListener("click", openPrizesModal);
 closePrizesBtn.addEventListener("click", closePrizesModal);
