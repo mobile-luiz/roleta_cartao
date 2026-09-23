@@ -536,7 +536,7 @@ function showResult(data) {
     validity.textContent = `Válido por ${COUPON_VALID_DAYS} dias (até ${fmtDay(Date.now() + COUPON_VALID_DAYS * DAY_MS)}) · ${round}`;
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.onclick = () => openWhatsApp(
-      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta da Sorte do PAD Saúde+ e ganhei ${data.value}% de desconto. Meu cupom é ${data.coupon}. Gostaria de agendar minha consulta.`
+      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei ${data.value}% de desconto. Meu cupom é ${data.coupon}. Gostaria de agendar minha consulta.`
     );
   } else if (data.type === "adesao") {
     emoji.textContent = "💳";
@@ -551,7 +551,7 @@ function showResult(data) {
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.innerHTML = "💳 Quero meu Cartão PAD Saúde+";
     whatsappBtn.onclick = () => openWhatsApp(
-      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta da Sorte e ganhei a ADESÃO GRÁTIS do Cartão PAD Saúde+. Meu cupom é ${data.coupon}. Gostaria de fazer meu cartão.`
+      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei a ADESÃO GRÁTIS. Meu cupom é ${data.coupon}. Gostaria de fazer meu cartão.`
     );
   } else if (data.type === "gift") {
     emoji.textContent = "🎁";
@@ -562,7 +562,7 @@ function showResult(data) {
     validity.textContent = `Retire em até ${GIFT_VALID_DAYS} dias (até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}) · ${round}`;
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.onclick = () => openWhatsApp(
-      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta da Sorte do PAD Saúde+ e ganhei um brinde especial (válido até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}). Gostaria de saber como retirar.`
+      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei um brinde especial (válido até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}). Gostaria de saber como retirar.`
     );
   } else {
     const lose = data.type === "lose";
