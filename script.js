@@ -18,7 +18,7 @@ const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").mat
 
 const segments = [
   { label: "50% OFF", type: "discount", value: 50 },
-  { label: "40% OFF", type: "discount", value: 40 },
+  { label: "ADESÃO GRÁTIS", type: "adesao", value: 0, lines: ["ADESÃO", "GRÁTIS", "CARTÃO PAD+"] },
   { label: "30% OFF", type: "discount", value: 30 },
   { label: "20% OFF", type: "discount", value: 20 },
   { label: "15% OFF", type: "discount", value: 15 },
@@ -240,6 +240,10 @@ function drawWheel() {
     if (seg.type === "discount") {
       drawLine(`${seg.value}%`, radius * .77, 46);
       drawLine("OFF", radius * .61, 22);
+    } else if (seg.lines) {
+      drawLine(seg.lines[0], radius * .82, 22);
+      drawLine(seg.lines[1], radius * .7, 22);
+      drawLine(seg.lines[2], radius * .58, 14);
     } else {
       const words = seg.label.split(" ");
       const half = Math.ceil(words.length / 2);
@@ -469,7 +473,7 @@ async function spin() {
 
     participant.roundsUsed = Number(lastResult.roundsUsed);
     showResult(lastResult);
-    if (lastResult.type === "discount" || lastResult.type === "gift") playFanfare();
+    if (["discount", "gift", "adesao"].includes(lastResult.type)) playFanfare();
     else playLoseSound();
 
     trackEvent("wheel_result", {
@@ -481,6 +485,7 @@ async function spin() {
       trackEvent("prize_won", { discount_percent: Number(lastResult.value || 0), round_number: Number(lastResult.roundsUsed || 0) });
       trackEvent("coupon_generated", { discount_percent: Number(lastResult.value || 0) });
     }
+    if (lastResult.type === "adesao") trackEvent("adesao_won", { round_number: Number(lastResult.roundsUsed || 0) });
     if (lastResult.type === "gift") trackEvent("gift_won", { round_number: Number(lastResult.roundsUsed || 0) });
   } catch (error) {
     console.error(error);
@@ -514,8 +519,10 @@ function showResult(data) {
   const firstName = (participant?.name || "").split(" ")[0];
 
   prize.classList.remove("hidden");
+  prize.classList.toggle("prize-long", data.type === "adesao");
   couponArea.classList.add("hidden");
   whatsappBtn.classList.add("hidden");
+  whatsappBtn.innerHTML = "📲 Agendar pelo WhatsApp";
 
   if (data.type === "discount") {
     emoji.textContent = "🎉";
@@ -530,6 +537,21 @@ function showResult(data) {
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.onclick = () => openWhatsApp(
       `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta da Sorte do PAD Saúde+ e ganhei ${data.value}% de desconto. Meu cupom é ${data.coupon}. Gostaria de agendar minha consulta.`
+    );
+  } else if (data.type === "adesao") {
+    emoji.textContent = "💳";
+    kicker.textContent = "Parabéns!";
+    main.textContent = firstName ? `${firstName}, você ganhou` : "Você ganhou";
+    prize.textContent = "ADESÃO GRÁTIS";
+    text.textContent = "Adesão grátis no Cartão PAD Saúde+: descontos em consultas e exames para você e sua família.";
+    coupon.textContent = data.coupon || "";
+    couponArea.classList.remove("hidden");
+    copyBtn.textContent = "Copiar";
+    validity.textContent = `Válido por ${COUPON_VALID_DAYS} dias (até ${fmtDay(Date.now() + COUPON_VALID_DAYS * DAY_MS)}) · ${round}`;
+    whatsappBtn.classList.remove("hidden");
+    whatsappBtn.innerHTML = "💳 Quero meu Cartão PAD Saúde+";
+    whatsappBtn.onclick = () => openWhatsApp(
+      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta da Sorte e ganhei a ADESÃO GRÁTIS do Cartão PAD Saúde+. Meu cupom é ${data.coupon}. Gostaria de fazer meu cartão.`
     );
   } else if (data.type === "gift") {
     emoji.textContent = "🎁";
@@ -626,18 +648,19 @@ async function searchMyPrizes() {
     prizesStatus.textContent = `${prizes.length} ${prizes.length === 1 ? "prêmio encontrado" : "prêmios encontrados"}`;
     prizesList.innerHTML = prizes.map(item => {
       const isDiscount = item.type === "discount";
-      const title = isDiscount ? `${Number(item.value || 0)}% OFF` : "Brinde especial";
-      const subtitle = isDiscount ? "Desconto para consulta" : "Retire com a equipe PAD Saúde+";
+      const isAdesao = item.type === "adesao";
+      const title = isDiscount ? `${Number(item.value || 0)}% OFF` : isAdesao ? "Adesão grátis" : "Brinde especial";
+      const subtitle = isDiscount ? "Desconto para consulta" : isAdesao ? "Cartão PAD Saúde+ sem taxa de adesão" : "Retire com a equipe PAD Saúde+";
       const used = !!item.utilizado;
       // Validade: vem do servidor; se faltar (prêmio antigo), calcula pela data do prêmio
-      const days = isDiscount ? COUPON_VALID_DAYS : GIFT_VALID_DAYS;
+      const days = item.type === "gift" ? GIFT_VALID_DAYS : COUPON_VALID_DAYS;
       const validUntil = Number(item.validUntilMs) || (Number(item.createdAtMs) ? Number(item.createdAtMs) + days * DAY_MS : 0);
       const expired = !used && validUntil > 0 && Date.now() > validUntil;
       const statusText = used ? "Utilizado" : expired ? "Vencido" : "Disponível";
       const statusClass = used ? "used" : expired ? "expired" : "";
       const validText = validUntil ? `${expired ? "Venceu em" : "Válido até"} ${fmtDay(validUntil)}` : "";
       return `<div class="prize-card">
-        <strong>${isDiscount ? "🏷️" : "🎁"} ${escapeHtml(title)}</strong>
+        <strong>${isDiscount ? "🏷️" : isAdesao ? "💳" : "🎁"} ${escapeHtml(title)}</strong>
         <div>${escapeHtml(subtitle)}</div>
         ${item.coupon ? `<div class="prize-code">${escapeHtml(item.coupon)}</div>` : ""}
         <div class="prize-meta">Rodada ${escapeHtml(item.roundNumber || "-")} · ${escapeHtml(item.date || "")} ${escapeHtml(item.time || "")}</div>

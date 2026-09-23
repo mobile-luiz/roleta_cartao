@@ -108,7 +108,8 @@ button:focus-visible, input:focus-visible {
   text-shadow: 0 5px 0 #09356f, 0 12px 25px rgba(0,0,0,.6);
 }
 .hero h1 span { color: var(--gold); }
-.hero-sub { color: var(--text-soft); font-size: clamp(15px, 2vw, 18px); margin: 0 auto; max-width: 46ch; }
+.hero-sub { color: var(--text-soft); font-size: clamp(15px, 2vw, 18px); margin: 0 auto; max-width: 60ch; line-height: 1.45; }
+.hero-sub b { color: var(--gold); }
 
 /* ---------- Área do jogo ---------- */
 .game {
@@ -335,6 +336,7 @@ button:focus-visible, input:focus-visible {
   text-shadow: 0 4px 0 #8d5d00;
   margin: 4px 0 8px;
 }
+.prize.prize-long { font-size: clamp(30px, 4.4vw, 42px); }
 .result.pop { animation: pop .45s cubic-bezier(.2,1.4,.4,1); }
 @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
