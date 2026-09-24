@@ -111,9 +111,10 @@ nameInput.addEventListener("input", () => nameInput.classList.remove("invalid"))
 
 function friendlyError(error, fallback) {
   const code = String(error?.code || "");
-  if (code.includes("unavailable") || code.includes("deadline")) return "Sem conexão com o servidor. Verifique sua internet e tente de novo.";
-  if (code.includes("internal")) return fallback;
-  return error?.message || fallback;
+  if (error instanceof RoletaDB.RoletaError) return error.message;
+  if (/permission/i.test(code) || /permission/i.test(String(error?.message))) return fallback;
+  if (/network|unavailable|disconnected/i.test(code)) return "Sem conexão. Verifique sua internet e tente de novo.";
+  return fallback;
 }
 
 function isInViewport(el) {
@@ -427,9 +428,8 @@ leadForm.addEventListener("submit", async (event) => {
   loginStatus.textContent = "";
 
   try {
-    const register = functions.httpsCallable("registerParticipant");
-    const response = await register({ name, phone, consent: true });
-    participant = { ...response.data, name, phone: normalizePhone(phone) };
+    const response = await RoletaDB.register(name, phone);
+    participant = { ...response, name, phone: normalizePhone(phone) };
     trackEvent("participant_registered", { participation_number: Number(participant.participationNumber || 1), max_rounds: MAX_ROUNDS });
 
     $("readyTitle").textContent = `Tudo pronto, ${name.split(" ")[0]}!`;
@@ -440,7 +440,7 @@ leadForm.addEventListener("submit", async (event) => {
   } catch (error) {
     console.error(error);
     loginStatus.textContent = friendlyError(error, "Não foi possível iniciar a participação.");
-    loginStatus.classList.add(String(error.code).includes("failed-precondition") ? "cooldown" : "error");
+    loginStatus.classList.add(error.code === "cooldown" ? "cooldown" : "error");
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Liberar a roleta 🎡";
@@ -462,9 +462,7 @@ async function spin() {
   trackEvent("wheel_spin", { round_number: Number(participant.roundsUsed || 0) + 1 });
 
   try {
-    const spinFunction = functions.httpsCallable("spinWheel");
-    const response = await spinFunction({ participantId: participant.id });
-    lastResult = response.data;
+    lastResult = await RoletaDB.spin(participant);
 
     const index = segments.findIndex(s => s.label === lastResult.label);
     if (index < 0) throw new Error("Resultado da roleta inválido.");
@@ -493,7 +491,7 @@ async function spin() {
     await landOn(angle + 180, 700);
     spinError.textContent = friendlyError(error, "Não foi possível realizar a rodada. Tente novamente.");
     spinError.classList.remove("hidden");
-    if (String(error.code).includes("resource-exhausted")) participant.roundsUsed = MAX_ROUNDS;
+    if (error.code === "exhausted") participant.roundsUsed = MAX_ROUNDS;
     revealPanel();
   } finally {
     spinning = false;
@@ -638,9 +636,7 @@ async function searchMyPrizes() {
   prizesStatus.textContent = "Consultando seus prêmios…";
   prizesList.innerHTML = "";
   try {
-    const getMyPrizes = functions.httpsCallable("getMyPrizes");
-    const response = await getMyPrizes({ phone });
-    const prizes = Array.isArray(response.data?.prizes) ? response.data.prizes : [];
+    const prizes = await RoletaDB.myPrizes(phone);
     if (!prizes.length) {
       prizesStatus.textContent = "";
       prizesList.innerHTML = '<div class="empty-prizes">Nenhum prêmio encontrado para este WhatsApp.</div>';

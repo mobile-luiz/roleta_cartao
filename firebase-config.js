@@ -1,5 +1,5 @@
 // Configuração do Firebase — Roleta do Cartão PAD Saúde+
-// Projeto: roleta-d372c
+// Projeto: roleta-d372c (Realtime Database, sem servidor)
 const firebaseConfig = {
   apiKey: "AIzaSyAwTRWdRi0X-O85bEM1r9d_jQPm6IWAs2k",
   authDomain: "roleta-d372c.firebaseapp.com",
@@ -13,5 +13,4 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
-const functions = firebase.app().functions("southamerica-east1");
+const rtdb = firebase.database();
