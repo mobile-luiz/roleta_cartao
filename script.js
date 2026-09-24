@@ -559,6 +559,7 @@ function showResult(data) {
     main.textContent = firstName ? `${firstName}, você ganhou` : "Você ganhou";
     prize.textContent = "BRINDE";
     text.textContent = "Fale com a equipe PAD Saúde+ para saber como retirar.";
+    whatsappBtn.innerHTML = "📲 Falar pelo WhatsApp";
     validity.textContent = `Retire em até ${GIFT_VALID_DAYS} dias (até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}) · ${round}`;
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.onclick = () => openWhatsApp(
