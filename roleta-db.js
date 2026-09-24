@@ -183,7 +183,7 @@ const RoletaDB = (() => {
     const now = serverNow();
     const coupon = prize.type === "discount" ? makeCoupon(prize.value)
       : prize.type === "adesao" ? makeCoupon("ADS")
-      : null;
+      : makeCoupon("BRD"); // brinde também tem cupom
     const days = prize.type === "gift" ? GIFT_DAYS : COUPON_DAYS;
 
     const premio = {

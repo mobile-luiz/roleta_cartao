@@ -557,11 +557,16 @@ function showResult(data) {
     main.textContent = firstName ? `${firstName}, você ganhou` : "Você ganhou";
     prize.textContent = "BRINDE";
     text.textContent = "Fale com a equipe PAD Saúde+ para saber como retirar.";
+    if (data.coupon) {
+      coupon.textContent = data.coupon;
+      couponArea.classList.remove("hidden");
+      copyBtn.textContent = "Copiar";
+    }
     whatsappBtn.innerHTML = "📲 Falar pelo WhatsApp";
     validity.textContent = `Retire em até ${GIFT_VALID_DAYS} dias (até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}) · ${round}`;
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.onclick = () => openWhatsApp(
-      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei um brinde especial (válido até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}). Gostaria de saber como retirar.`
+      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei um brinde especial (válido até ${fmtDay(Date.now() + GIFT_VALID_DAYS * DAY_MS)}).${data.coupon ? ` Meu cupom é ${data.coupon}.` : ""} Gostaria de saber como retirar.`
     );
   } else {
     const lose = data.type === "lose";
