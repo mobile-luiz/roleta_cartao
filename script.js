@@ -522,21 +522,21 @@ function showResult(data) {
   prize.classList.toggle("prize-long", data.type === "adesao");
   couponArea.classList.add("hidden");
   whatsappBtn.classList.add("hidden");
-  whatsappBtn.innerHTML = "📲 Agendar pelo WhatsApp";
+  whatsappBtn.innerHTML = "💳 Quero meu Cartão PAD Saúde+";
 
   if (data.type === "discount") {
     emoji.textContent = "🎉";
     kicker.textContent = "Parabéns!";
     main.textContent = "Você ganhou";
     prize.textContent = `${data.value}% OFF`;
-    text.textContent = "Desconto para a sua consulta no PAD Saúde+.";
+    text.textContent = "Desconto na adesão do Cartão PAD Saúde+: descontos em consultas e exames para você e sua família.";
     coupon.textContent = data.coupon || "";
     couponArea.classList.remove("hidden");
     copyBtn.textContent = "Copiar";
     validity.textContent = `Válido por ${COUPON_VALID_DAYS} dias (até ${fmtDay(Date.now() + COUPON_VALID_DAYS * DAY_MS)}) · ${round}`;
     whatsappBtn.classList.remove("hidden");
     whatsappBtn.onclick = () => openWhatsApp(
-      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei ${data.value}% de desconto. Meu cupom é ${data.coupon}. Gostaria de agendar minha consulta.`
+      `Olá! Meu nome é ${participant?.name || ""}. Participei da Roleta do Cartão PAD Saúde+ e ganhei ${data.value}% de desconto na adesão do cartão. Meu cupom é ${data.coupon}. Gostaria de fazer meu Cartão PAD Saúde+.`
     );
   } else if (data.type === "adesao") {
     emoji.textContent = "💳";
@@ -651,7 +651,7 @@ async function searchMyPrizes() {
       const isDiscount = item.type === "discount";
       const isAdesao = item.type === "adesao";
       const title = isDiscount ? `${Number(item.value || 0)}% OFF` : isAdesao ? "Adesão grátis" : "Brinde especial";
-      const subtitle = isDiscount ? "Desconto para consulta" : isAdesao ? "Cartão PAD Saúde+ sem taxa de adesão" : "Retire com a equipe PAD Saúde+";
+      const subtitle = isDiscount ? "Desconto na adesão do Cartão PAD Saúde+" : isAdesao ? "Cartão PAD Saúde+ sem taxa de adesão" : "Retire com a equipe PAD Saúde+";
       const used = !!item.utilizado;
       // Validade: vem do servidor; se faltar (prêmio antigo), calcula pela data do prêmio
       const days = item.type === "gift" ? GIFT_VALID_DAYS : COUPON_VALID_DAYS;
@@ -690,7 +690,7 @@ prizesList.addEventListener("click", (event) => {
   if (!btn) return;
   const item = lastPrizes[Number(btn.dataset.index)];
   if (!item) return;
-  const prizeName = item.type === "discount" ? `${Number(item.value || 0)}% OFF em consulta`
+  const prizeName = item.type === "discount" ? `${Number(item.value || 0)}% OFF na adesão do Cartão PAD Saúde+`
     : item.type === "adesao" ? "Adesão grátis do Cartão PAD Saúde+"
     : "Brinde especial";
   const lines = [
