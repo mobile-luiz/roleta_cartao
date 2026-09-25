@@ -4,7 +4,7 @@
 
 // ⚠️ CONFIGURE AQUI o WhatsApp da CLÍNICA (só números, com 55 + DDD).
 // Ex.: "5581999999999". Se ficar vazio, o WhatsApp abre para a pessoa escolher o contato.
-const CLINIC_WHATSAPP = "5581982714884";
+const CLINIC_WHATSAPP = "5581921434317";
 
 const MAX_ROUNDS = 10;
 const COUPON_VALID_DAYS = 7;       // validade do cupom de desconto
