@@ -310,6 +310,14 @@ button:focus-visible, input:focus-visible {
   cursor: pointer;
 }
 .check input { margin-top: 3px; width: 18px; height: 18px; flex: none; accent-color: var(--gold); }
+.check .privacy-link {
+  color: var(--gold);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.check .privacy-link:hover,
+.check .privacy-link:focus-visible { color: #fff; outline: none; }
 
 .primary, .whatsapp, .again {
   width: 100%;
@@ -513,3 +521,4 @@ footer { text-align: center; color: #8aa3c9; font-size: 12px; margin-top: 26px; 
   .result.pop { animation: none; }
   * { scroll-behavior: auto !important; }
 }
+
